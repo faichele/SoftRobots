@@ -1,0 +1,6 @@
+std_msgs/String cableActuator
+---
+geometry_msgs/Point[] cableActuatorPoints
+std_msgs/Float32 cableLength
+std_msgs/Float32 force
+std_msgs/Float32 displacement
