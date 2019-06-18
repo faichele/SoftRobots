@@ -34,7 +34,7 @@
 #include "model/SurfacePressureModel.h"
 #include <sofa/helper/OptionsGroup.h>
 
-#include <SoftRobots/initSoftRobots.h>
+#include "../initSoftRobots.h"
 
 namespace sofa
 {
@@ -128,6 +128,9 @@ public:
                                  unsigned int& offset) override;
     ///////////////////////////////////////////////////////////////////////////////////
 
+    double getCurrentPressure() const;
+    double getCurrentVolumeGrowth() const;
+    double getCurrentCavityVolume() const;
 
 protected:
 

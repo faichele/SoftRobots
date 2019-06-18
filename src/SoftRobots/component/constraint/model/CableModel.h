@@ -109,6 +109,14 @@ public:
                      const BaseVector* lambda) override;
     /////////////////////////////////////////////////////////////////////////
 
+    SReal getInitialCableLength() const;
+    SReal getCurrentCableLength() const;
+
+    double getForce() const;
+    double getDisplacement() const;
+
+    const std::vector<sofa::defaulttype::Vector3> getCableActuatorPoints() const;
+
 protected:
 
     Data<SetIndexArray>         d_indices;

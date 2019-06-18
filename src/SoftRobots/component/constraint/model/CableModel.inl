@@ -70,8 +70,7 @@ CableModel<DataTypes>::CableModel(MechanicalState* object)
                               "If false, the pull point is not considered and the cable is entirely mapped \n"
                               " In that case, needs at least 2 different point in indices."))
 
-    , d_cableInitialLength(initData(&d_cableInitialLength, Real(0.0), "cableInitialLength","This value can be defined by the user. \n"
-                                    "If not defined, it will correspond to the length of the cable at the start of the simulation"))
+    , d_cableInitialLength(initData(&d_cableInitialLength, Real(0.0), "cableInitialLength"," "))
 
     , d_cableLength(initData(&d_cableLength, Real(0.0), "cableLength","Computation done at the end of the time step"))
 
@@ -122,6 +121,7 @@ CableModel<DataTypes>::~CableModel()
 template<class DataTypes>
 void CableModel<DataTypes>::setUpData()
 {
+    d_cableInitialLength.setReadOnly(true);
     d_cableLength.setReadOnly(true);
 
     d_force.setGroup("Vector");
@@ -160,17 +160,14 @@ void CableModel<DataTypes>::bwdInit()
     if(m_componentstate != ComponentState::Valid)
             return ;
 
-    // The initial length of the cable is set or computed in bwdInit so the mapping (if there is any)
+    // The initial length of the cable is computed in bwdInit so the mapping (if there is any)
     // will be considered
     ReadAccessor<Data<VecCoord>> positions = m_state->readPositions();
     ReadAccessor<Data<VecCoord>> restPositions = m_state->readRestPositions();
 
     Real cableLength = getCableLength(positions.ref());
-
-    if (!d_cableInitialLength.isSet()){
-        Real initialCableLength = getCableLength(restPositions.ref());
-        d_cableInitialLength.setValue(initialCableLength);
-    }
+    Real initialCableLength = getCableLength(restPositions.ref());
+    d_cableInitialLength.setValue(initialCableLength);
     d_cableLength.setValue(cableLength);
 }
 
@@ -251,6 +248,48 @@ void CableModel<DataTypes>::checkIndicesRegardingState()
     }
 }
 
+template<class DataTypes>
+SReal CableModel<DataTypes>::getInitialCableLength() const
+{
+    return d_cableInitialLength.getValue();
+}
+
+template<class DataTypes>
+SReal CableModel<DataTypes>::getCurrentCableLength() const
+{
+    return d_cableLength.getValue();
+}
+
+template<class DataTypes>
+double CableModel<DataTypes>::getForce() const
+{
+    return d_force.getValue();
+}
+
+template<class DataTypes>
+double CableModel<DataTypes>::getDisplacement() const
+{
+    return d_displacement.getValue();
+}
+
+template<class DataTypes>
+const std::vector<sofa::defaulttype::Vector3> CableModel<DataTypes>::getCableActuatorPoints() const
+{
+    std::vector<sofa::defaulttype::Vector3> points;
+    ReadAccessor<Data<VecCoord>> positions = m_state->readPositions();
+
+    points.resize(positions.size());
+
+    //const SetIndexArray &indices = d_indices.getValue();
+
+    for (unsigned int i = 0; i < positions.size(); i++)
+        msg_info("CableModel") << "Point " << i << ": " << positions[i];
+
+    for (unsigned int i = 0; i < positions.size(); i++)
+        points[i] = positions[i];
+
+    return points;
+}
 
 template<class DataTypes>
 SReal CableModel<DataTypes>::getCableLength(const VecCoord &positions)

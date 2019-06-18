@@ -185,6 +185,41 @@ if(SOFTROBOTS_ROBOTINOCONTROLLER)
 endif()
 
 
+if (PLUGIN_ZYROSCONNECTOR)
+    message(STATUS "ZyROSConnector plugin is part of the SOFA build, adding SoftRobots bindings.")
+
+    find_package(ROS QUIET REQUIRED)
+    message(STATUS "ROS found: ${ROS_FOUND}")
+    find_package(Boost COMPONENTS regex thread signals QUIET REQUIRED)
+    find_package(Log4cxx QUIET REQUIRED)
+
+    # Boost
+    find_package(Boost COMPONENTS system chrono thread REQUIRED QUIET)
+    include_directories(${Boost_INCLUDE_DIR})
+    link_directories(${Boost_LIBRARY_DIRS})
+
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+    # Dependency libraries
+    include_directories(${CMAKE_SOURCE_DIR}/applications/plugins/SofaROSConnector)
+    include_directories(${CMAKE_SOURCE_DIR}/applications/plugins/SofaROSConnector/ZyROSConnector)
+
+    # ROS
+    include_directories(${ROS_INCLUDE_DIR})
+    include_directories(${LOG4CXX_INCLUDE_DIRS})
+
+    add_definitions(-DSOFA_SOFT_ROBOTS_ROS_CONNECTOR_FOUND)
+
+    list(APPEND HEADER_FILES
+        ${SOFTROBOTS_SOURCE_DIR}/component/ros_connector/SoftRobotsROSConnector.h
+        ${SOFTROBOTS_SOURCE_DIR}/component/ros_connector/SoftRobotROSConnectorServers.h
+        )
+    list(APPEND SOURCE_FILES
+        ${SOFTROBOTS_SOURCE_DIR}/component/ros_connector/SoftRobotsROSConnector.cpp
+        ${SOFTROBOTS_SOURCE_DIR}/component/ros_connector/SoftRobotROSConnectorServers.cpp
+        )
+endif()
+
 # initSoftRobots.h
 configure_file(${SOFTROBOTS_SOURCE_DIR}/component/initSoftRobots.h.in "${CMAKE_BINARY_DIR}/include/SoftRobots/initSoftRobots.h")
 install(FILES "${CMAKE_BINARY_DIR}/include/SoftRobots/initSoftRobots.h" DESTINATION "include/SoftRobots" COMPONENT headers)
@@ -212,6 +247,13 @@ if(SOFTROBOTS_GAMETRAKCONTROLLER)
     find_package(HIDAPI REQUIRED)
     include_directories(${HIDAPI_INCLUDE_DIRS})
     target_link_libraries(${PROJECT_NAME} ${HIDAPI_LIBRARIES} ${BOOST_THREAD_LIBRARY})
+endif()
+
+if (PLUGIN_ZYROSCONNECTOR)
+    target_link_libraries(${PROJECT_NAME} ${ROS_LIBRARY} ${ROS_CPP_LIBRARY} ${ROS_CPPCOMMON_LIBRARY} ${ROS_TIME_LIBRARY} ${ROS_CONSOLE_LIBRARY} ${ROS_CPP_SERIALIZATION_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} ${Boost_THREAD_LIBRARY} ${Boost_SIGNALS_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} ${LOG4CXX_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ZyROSConnector ZyROSConnectionManager)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>")

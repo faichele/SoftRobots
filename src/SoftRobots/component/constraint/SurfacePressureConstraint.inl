@@ -192,6 +192,24 @@ void SurfacePressureConstraint<DataTypes>::setUpPressureLimits(double& imposedVa
         maxVolumeGrowth =d_maxVolumeGrowth.getValue();
 }
 
+template<class DataTypes>
+double SurfacePressureConstraint<DataTypes>::getCurrentPressure() const
+{
+    return this->d_pressure.getValue();
+}
+
+template<class DataTypes>
+double SurfacePressureConstraint<DataTypes>::getCurrentVolumeGrowth() const
+{
+    return d_volumeGrowth.getValue();
+}
+
+template<class DataTypes>
+double SurfacePressureConstraint<DataTypes>::getCurrentCavityVolume() const
+{
+    return this->d_cavityVolume.getValue();
+}
+
 }
 
 } // namespace constraintset

@@ -64,14 +64,22 @@ void initExternalModule()
     first = false;
 
     // Automatically load the STLIB plugin if available.
-    if( !PluginManager::getInstance().findPlugin("STLIB").empty() )
+    if(!PluginManager::getInstance().findPlugin("STLIB").empty())
     {
-        PluginManager::getInstance().loadPlugin("STLIB") ;
+        PluginManager::getInstance().loadPlugin("STLIB");
     }
 
 #ifdef SOFTROBOTS_PYTHON
     PythonEnvironment::addPythonModulePathsForPluginsByName(getModuleName());
 #endif
+
+#ifdef SOFA_SOFT_ROBOTS_ROS_CONNECTOR_FOUND
+    if (!PluginManager::getInstance().findPlugin("ZyROSConnector").empty())
+    {
+        PluginManager::getInstance().loadPlugin("ZyROSConnector");
+    }
+#endif
+
     //SparseCholeskySolver< CompressedRowSparseMatrix<double>,FullVector<double> > test;
 }
 
@@ -116,4 +124,8 @@ SOFA_LINK_CLASS(InteractiveControl)
 SOFA_LINK_CLASS(UnilateralPlaneConstraint)
 SOFA_LINK_CLASS(VolumeFromTriangles)
 SOFA_LINK_CLASS(VolumeFromTetrahedrons)
+
+#ifdef SOFA_SOFT_ROBOTS_ROS_CONNECTOR_FOUND
+SOFA_LINK_CLASS(SofaSoftRobotsROSConnector)
+#endif
 
